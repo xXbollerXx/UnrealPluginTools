@@ -7,6 +7,7 @@
 #include "Widgets/Docking/SDockTab.h"
 #include "Widgets/Layout/SBox.h"
 #include "Widgets/Text/STextBlock.h"
+#include "Widgets/Input/SButton.h"
 #include "ToolMenus.h"
 
 static const FName HelperWindowPluginTabName("HelperWindowPlugin");
@@ -68,10 +69,29 @@ TSharedRef<SDockTab> FHelperWindowPluginModule::OnSpawnPluginTab(const FSpawnTab
 			.HAlign(HAlign_Center)
 			.VAlign(VAlign_Center)
 			[
-				SNew(STextBlock)
-				.Text(WidgetText)
+				SNew(SVerticalBox)
+				+ SVerticalBox::Slot()
+				.HAlign(HAlign_Fill)
+				.VAlign(VAlign_Fill)
+				[
+					SNew(STextBlock)
+					.Text(WidgetText)
+				]
+				+ SVerticalBox::Slot()
+				[
+					SNew(SButton)
+					.Text(FText::FromString("Spawn Actor"))
+					//.ClickMethod(EButtonClickMethod::MouseUp)
+					.OnClicked_Raw(this, &FHelperWindowPluginModule::SpawnMeshActor)
+				]
 			]
 		];
+}
+
+FReply FHelperWindowPluginModule::SpawnMeshActor()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Function : I DID IT"));
+	return FReply::Handled();
 }
 
 void FHelperWindowPluginModule::PluginButtonClicked()
