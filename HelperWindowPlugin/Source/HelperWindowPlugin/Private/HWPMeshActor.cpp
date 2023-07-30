@@ -14,11 +14,6 @@ AHWPMeshActor::AHWPMeshActor()
 	// hard ref static mesh here?
 }
 
-void AHWPMeshActor::SetIsEnabled(const bool Enabled)
-{
-	IsEnabled = Enabled;
-}
-
 #if WITH_EDITOR
 
 void AHWPMeshActor::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
