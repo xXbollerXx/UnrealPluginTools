@@ -4,36 +4,73 @@
 #include "HelperWindowPluginMenu.h"
 
 #include "HWPMeshActor.h"
+#include "Selection.h"
 #include "SlateOptMacros.h"
+#include "Slate/Private/Widgets/Views/SListPanel.h"
 
 BEGIN_SLATE_FUNCTION_BUILD_OPTIMIZATION
 
 void SHelperWindowPluginMenu::Construct(const FArguments& InArgs)
 {
+
+
+	TSharedRef<SHorizontalBox> TextHorizontalBox = SNew(SHorizontalBox);
+	TextHorizontalBox->AddSlot()
+	[
+		SNew(STextBlock)
+		.Text(FText::FromString("Actor Name"))
+	];
+
+	TextHorizontalBox->AddSlot()
+	[
+		SAssignNew(ActorNameTextBlock, STextBlock)
+		.Text(FText::FromString("TESTNAME"))
+	];
+
+
+	
+	TSharedRef<SHorizontalBox> CheckHorizontalBox = SNew(SHorizontalBox);
+	CheckHorizontalBox->AddSlot()
+	[
+		SNew(STextBlock)
+		.Text(FText::FromString("IsEnabled"))
+	];
+
+	CheckHorizontalBox->AddSlot()
+	[
+		SAssignNew(CheckBox, SCheckBox)
+	];
+
+
+	
 	ChildSlot
 	[
-			SNew(SBox)
-			.HAlign(HAlign_Center)
-			.VAlign(VAlign_Center)
+		SNew(SVerticalBox)
+		+ SVerticalBox::Slot()
+		.HAlign(HAlign_Fill)
+		.AutoHeight()
+		.Padding(5)
 			[
-				SNew(SVerticalBox)
-				+ SVerticalBox::Slot()
-				.HAlign(HAlign_Fill)
-				.VAlign(VAlign_Fill)
-				[
-					SNew(SButton)
-					.Text(FText::FromString("Spawn Actor other"))
-					.OnClicked(this, &SHelperWindowPluginMenu::SpawnMeshActor)
-				]
-				+ SVerticalBox::Slot()
-				[
-					TextBlock = SNew(STextBlock)
-					.Text(FText::FromString("ffffffff"))
-				]
-				+ SVerticalBox::Slot()
-				[
-					CheckBox = SNew(SCheckBox)
-				]
+				SNew(SHorizontalBox)
+				+ SHorizontalBox::Slot()
+				.AutoWidth()
+					[
+						SNew(SButton)
+						.Text(FText::FromString("Spawn Actor other"))
+						.OnClicked(this, &SHelperWindowPluginMenu::SpawnMeshActor)
+					]
+			]
+		+ SVerticalBox::Slot()
+		.AutoHeight()
+		.Padding(5)
+			[
+				TextHorizontalBox
+			]
+		+ SVerticalBox::Slot()
+		.AutoHeight()
+		.Padding(5)
+			[
+				CheckHorizontalBox
 			]
 	];
 
@@ -50,15 +87,38 @@ void SHelperWindowPluginMenu::Tick(const FGeometry& AllottedGeometry, const doub
 	const float InDeltaTime)
 {
 	SCompoundWidget::Tick(AllottedGeometry, InCurrentTime, InDeltaTime);
-	UE_LOG(LogTemp, Warning, TEXT("Function : Update"));
 
-	for (auto Element : GEditor->GetSelectedActors())
+	bool IsUndetermined = false;
+	AHWPMeshActor* PreActor = nullptr;
+
+	ActorNameTextBlock->SetVisibility(EVisibility::Visible);
+	CheckBox->SetVisibility(EVisibility::Visible);
+	for (FSelectionIterator It(GEditor->GetSelectedActorIterator()); It; ++It)
 	{
-		AHWPMeshActor* g = Cast<AHWPMeshActor>(Element);
-		if (!g) continue;
-
-		CheckBox.Get().SetIsChecked(g->SetIsEnabled())
+		AHWPMeshActor* Actor = Cast<AHWPMeshActor>(*It);
+		if (!Actor)
+		{
+			ActorNameTextBlock->SetVisibility(EVisibility::Collapsed);
+			CheckBox->SetVisibility(EVisibility::Collapsed);
+			continue;
+		}
+		
+		if (PreActor && PreActor->IsEnabled != Actor->IsEnabled)
+		{
+			IsUndetermined = true;
+			ActorNameTextBlock->SetVisibility(EVisibility::Collapsed);
+			CheckBox->SetIsChecked( ECheckBoxState::Undetermined);
+		}
+		
+		if (!IsUndetermined)
+		{
+			ActorNameTextBlock->SetText(FText::FromString(Actor->GetActorLabel()));
+			CheckBox->SetIsChecked(Actor->IsEnabled ? ECheckBoxState::Checked : ECheckBoxState::Unchecked);
+		}
+		
 	}
+
+	
 }
 
 END_SLATE_FUNCTION_BUILD_OPTIMIZATION

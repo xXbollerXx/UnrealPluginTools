@@ -25,7 +25,7 @@ public:
 
 	virtual void Tick(const FGeometry& AllottedGeometry, const double InCurrentTime, const float InDeltaTime) override;
 
-	TSharedRef<SCheckBox> CheckBox;
+	TSharedPtr<SCheckBox> CheckBox;
 
-	TSharedRef<STextBlock> TextBlock;
+	TSharedPtr<STextBlock> ActorNameTextBlock;
 };
