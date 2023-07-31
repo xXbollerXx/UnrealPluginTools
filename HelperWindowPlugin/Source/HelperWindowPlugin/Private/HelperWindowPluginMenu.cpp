@@ -3,10 +3,10 @@
 
 #include "HelperWindowPluginMenu.h"
 
+#include "EditorLevelUtils.h"
 #include "HWPMeshActor.h"
 #include "Selection.h"
 #include "SlateOptMacros.h"
-#include "Slate/Private/Widgets/Views/SListPanel.h"
 
 BEGIN_SLATE_FUNCTION_BUILD_OPTIMIZATION
 
@@ -28,7 +28,6 @@ void SHelperWindowPluginMenu::Construct(const FArguments& InArgs)
 	];
 
 
-	
 	TSharedRef<SHorizontalBox> CheckHorizontalBox = SNew(SHorizontalBox);
 	CheckHorizontalBox->AddSlot()
 	[
@@ -74,13 +73,19 @@ void SHelperWindowPluginMenu::Construct(const FArguments& InArgs)
 				CheckHorizontalBox
 			]
 	];
-
-	
 }
 
 FReply SHelperWindowPluginMenu::SpawnMeshActor()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Function : I DID IT"));
+
+	UWorld* World = GEngine->GetWorldContexts()[0].World();
+	if (World)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Function : Got world"));
+
+		World->SpawnActor(AHWPMeshActor::StaticClass());
+	}
 	return FReply::Handled();
 }
 
