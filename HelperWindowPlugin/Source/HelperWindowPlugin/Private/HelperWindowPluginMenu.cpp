@@ -88,37 +88,39 @@ void SHelperWindowPluginMenu::Tick(const FGeometry& AllottedGeometry, const doub
 {
 	SCompoundWidget::Tick(AllottedGeometry, InCurrentTime, InDeltaTime);
 
-	bool IsUndetermined = false;
-	AHWPMeshActor* PreActor = nullptr;
 
 	ActorNameTextBlock->SetVisibility(EVisibility::Visible);
 	CheckBox->SetVisibility(EVisibility::Visible);
+	
+	AHWPMeshActor* FirstInstance = nullptr;
 	for (FSelectionIterator It(GEditor->GetSelectedActorIterator()); It; ++It)
 	{
 		AHWPMeshActor* Actor = Cast<AHWPMeshActor>(*It);
+		UE_LOG(LogTemp, Warning, TEXT("Function : Actor name : %s"), *Actor->GetActorLabel());
+
 		if (!Actor)
 		{
 			ActorNameTextBlock->SetVisibility(EVisibility::Collapsed);
 			CheckBox->SetVisibility(EVisibility::Collapsed);
-			continue;
+			break;
 		}
-		
-		if (PreActor && PreActor->IsEnabled != Actor->IsEnabled)
+
+		if (FirstInstance)
 		{
-			IsUndetermined = true;
 			ActorNameTextBlock->SetVisibility(EVisibility::Collapsed);
-			CheckBox->SetIsChecked( ECheckBoxState::Undetermined);
+			
+			if (FirstInstance->IsEnabled != Actor->IsEnabled)
+			{
+				CheckBox->SetIsChecked( ECheckBoxState::Undetermined);
+			}
 		}
-		
-		if (!IsUndetermined)
+		else
 		{
+			FirstInstance = Actor;
 			ActorNameTextBlock->SetText(FText::FromString(Actor->GetActorLabel()));
 			CheckBox->SetIsChecked(Actor->IsEnabled ? ECheckBoxState::Checked : ECheckBoxState::Unchecked);
 		}
-		
 	}
-
-	
 }
 
 END_SLATE_FUNCTION_BUILD_OPTIMIZATION
