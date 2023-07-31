@@ -79,7 +79,7 @@ FReply SHelperWindowPluginMenu::SpawnMeshActor()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Function : I DID IT"));
 
-	UWorld* World = GEngine->GetWorldContexts()[0].World();
+	UWorld* World = GEditor->GetEditorWorldContext().World();
 	if (World)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Function : Got world"));
