@@ -14,6 +14,12 @@ AHWPMeshActor::AHWPMeshActor()
 	// hard ref static mesh here?
 }
 
+void AHWPMeshActor::SetIsEnabled(bool InEnabled)
+{
+	IsEnabled = InEnabled;
+	StaticMeshComponent->SetVisibility(IsEnabled);
+}
+
 #if WITH_EDITOR
 
 void AHWPMeshActor::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)

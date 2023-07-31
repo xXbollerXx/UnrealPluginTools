@@ -11,8 +11,10 @@ class AHWPMeshActor : public AActor
 public:	
 	AHWPMeshActor();
 
-	UPROPERTY(EditAnywhere)
-	bool IsEnabled = true;
+	void SetIsEnabled(bool InEnabled);
+
+	bool GetIsEnabled() const {return IsEnabled;}
+
 protected:
 
 #if WITH_EDITOR
@@ -21,6 +23,8 @@ protected:
 
 private:
 	
+	UPROPERTY(EditAnywhere)
+	bool IsEnabled = true;
 	UPROPERTY(VisibleAnywhere)
 	UStaticMeshComponent* StaticMeshComponent;
 

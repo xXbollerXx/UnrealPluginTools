@@ -23,6 +23,8 @@ public:
 
 	FReply SpawnMeshActor();
 
+	void OnCheckboxChanged(ECheckBoxState CheckBoxState);
+
 	virtual void Tick(const FGeometry& AllottedGeometry, const double InCurrentTime, const float InDeltaTime) override;
 
 	TSharedPtr<SCheckBox> CheckBox;

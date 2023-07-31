@@ -39,6 +39,7 @@ void SHelperWindowPluginMenu::Construct(const FArguments& InArgs)
 	CheckHorizontalBox->AddSlot()
 	[
 		SAssignNew(CheckBox, SCheckBox)
+		.OnCheckStateChanged(this, &SHelperWindowPluginMenu::OnCheckboxChanged)
 	];
 
 
@@ -83,8 +84,20 @@ FReply SHelperWindowPluginMenu::SpawnMeshActor()
 	return FReply::Handled();
 }
 
+void SHelperWindowPluginMenu::OnCheckboxChanged(ECheckBoxState CheckBoxState)
+{
+	for (FSelectionIterator It(GEditor->GetSelectedActorIterator()); It; ++It)
+	{
+		AHWPMeshActor* Actor = Cast<AHWPMeshActor>(*It);
+		if (Actor)
+		{
+			Actor->SetIsEnabled(CheckBoxState == ECheckBoxState::Checked ? true : false);
+		}
+	}
+}
+
 void SHelperWindowPluginMenu::Tick(const FGeometry& AllottedGeometry, const double InCurrentTime,
-	const float InDeltaTime)
+                                   const float InDeltaTime)
 {
 	SCompoundWidget::Tick(AllottedGeometry, InCurrentTime, InDeltaTime);
 
@@ -109,7 +122,7 @@ void SHelperWindowPluginMenu::Tick(const FGeometry& AllottedGeometry, const doub
 		{
 			ActorNameTextBlock->SetVisibility(EVisibility::Collapsed);
 			
-			if (FirstInstance->IsEnabled != Actor->IsEnabled)
+			if (FirstInstance->GetIsEnabled() != Actor->GetIsEnabled())
 			{
 				CheckBox->SetIsChecked( ECheckBoxState::Undetermined);
 			}
@@ -118,7 +131,7 @@ void SHelperWindowPluginMenu::Tick(const FGeometry& AllottedGeometry, const doub
 		{
 			FirstInstance = Actor;
 			ActorNameTextBlock->SetText(FText::FromString(Actor->GetActorLabel()));
-			CheckBox->SetIsChecked(Actor->IsEnabled ? ECheckBoxState::Checked : ECheckBoxState::Unchecked);
+			CheckBox->SetIsChecked(Actor->GetIsEnabled() ? ECheckBoxState::Checked : ECheckBoxState::Unchecked);
 		}
 	}
 }
