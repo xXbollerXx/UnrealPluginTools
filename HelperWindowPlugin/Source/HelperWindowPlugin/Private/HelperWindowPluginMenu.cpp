@@ -5,6 +5,7 @@
 
 #include "EditorLevelUtils.h"
 #include "HWPMeshActor.h"
+#include "PropertyCustomizationHelpers.h"
 #include "Selection.h"
 #include "SlateOptMacros.h"
 
@@ -41,8 +42,21 @@ void SHelperWindowPluginMenu::Construct(const FArguments& InArgs)
 		.OnCheckStateChanged(this, &SHelperWindowPluginMenu::OnCheckboxChanged)
 	];
 
+	TArray<const UClass*> AllowedClasses;
+	AllowedClasses.Add(UStaticMesh::StaticClass());
+	TArray<TWeakObjectPtr<USoundWave>> Objects;
 
-	
+	TSharedRef<SWidget> StaticMeshPicker = PropertyCustomizationHelpers::MakeAssetPickerWithMenu(
+		FAssetData(),
+		false,
+		AllowedClasses,
+		PropertyCustomizationHelpers::GetNewAssetFactoriesForClasses(AllowedClasses),
+		FOnShouldFilterAsset(),
+		FOnAssetSelected::CreateSP(this, &SHelperWindowPluginMenu::OnAssetSelected),
+		FSimpleDelegate()
+		);
+
+
 	ChildSlot
 	[
 		SNew(SVerticalBox)
@@ -70,7 +84,23 @@ void SHelperWindowPluginMenu::Construct(const FArguments& InArgs)
 		.AutoHeight()
 		.Padding(5)
 			[
-				CheckHorizontalBox
+				SNew(SHorizontalBox)
+				+SHorizontalBox::Slot()
+				[
+					//CheckHorizontalBox
+					//SNew(SPropertyValueWidget)
+					//StaticMeshPicker
+					SNew(SObjectPropertyEntryBox)
+					.DisplayBrowse(true)
+					.DisplayCompactSize(false)
+					.DisplayThumbnail(true)
+					.DisplayUseSelected(true)
+					.EnableContentPicker(true)
+					.AllowedClass(UStaticMesh::StaticClass())
+					.AllowClear(true)
+					.ObjectPath(this, &SHelperWindowPluginMenu::GetCurrentStaticMeshPath)
+					.OnObjectChanged(this, &SHelperWindowPluginMenu::OnStaticMeshSelected)
+				]
 			]
 	];
 }
@@ -87,6 +117,20 @@ FReply SHelperWindowPluginMenu::SpawnMeshActor()
 		World->SpawnActor(AHWPMeshActor::StaticClass());
 	}
 	return FReply::Handled();
+}
+
+void SHelperWindowPluginMenu::OnAssetSelected(const FAssetData& AssetData)
+{
+	StaticMesh = CastChecked<UStaticMesh>(AssetData.GetAsset());
+}
+
+FString SHelperWindowPluginMenu::GetCurrentStaticMeshPath() const
+{
+	return StaticMesh ? StaticMesh->GetPathName() : FString("");
+}
+
+void SHelperWindowPluginMenu::OnStaticMeshSelected(const FAssetData& AssetData)
+{
 }
 
 void SHelperWindowPluginMenu::OnCheckboxChanged(ECheckBoxState CheckBoxState)

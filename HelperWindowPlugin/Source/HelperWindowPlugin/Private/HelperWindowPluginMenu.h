@@ -23,6 +23,13 @@ public:
 
 	FReply SpawnMeshActor();
 
+	UFUNCTION()
+	void OnAssetSelected(const FAssetData& AssetData);
+
+	FString GetCurrentStaticMeshPath() const;
+
+	void OnStaticMeshSelected(const FAssetData& AssetData);
+
 	void OnCheckboxChanged(ECheckBoxState CheckBoxState);
 
 	virtual void Tick(const FGeometry& AllottedGeometry, const double InCurrentTime, const float InDeltaTime) override;
@@ -30,4 +37,7 @@ public:
 	TSharedPtr<SCheckBox> CheckBox;
 
 	TSharedPtr<STextBlock> ActorNameTextBlock;
+
+	UPROPERTY()
+	UStaticMesh* StaticMesh = nullptr;
 };
