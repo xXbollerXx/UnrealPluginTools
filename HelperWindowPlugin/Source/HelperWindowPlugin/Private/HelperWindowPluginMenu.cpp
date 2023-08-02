@@ -80,6 +80,12 @@ void SHelperWindowPluginMenu::Construct(const FArguments& InArgs)
 		.AutoHeight()
 		.Padding(5)
 			[
+				CheckHorizontalBox
+			]
+		+ SVerticalBox::Slot()
+		.AutoHeight()
+		.Padding(5)
+			[
 				SNew(SHorizontalBox)
 				+SHorizontalBox::Slot()
 				[
