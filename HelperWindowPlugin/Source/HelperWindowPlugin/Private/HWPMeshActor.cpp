@@ -3,6 +3,7 @@
 
 #include "UObject/ConstructorHelpers.h"
 
+
 AHWPMeshActor::AHWPMeshActor()
 {
 	PrimaryActorTick.bCanEverTick = false;
@@ -11,11 +12,6 @@ AHWPMeshActor::AHWPMeshActor()
 	SetRootComponent(CreateDefaultSubobject<USceneComponent>(TEXT("Root")));
 
 	StaticMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
-	static ConstructorHelpers::FObjectFinder<UStaticMesh> StaticMeshObject(TEXT("/Engine/Content/BasicShapes/Cube"));
-	//if (StaticMeshObject.Succeeded())
-	//{
-		StaticMeshComponent->SetStaticMesh(StaticMeshObject.Object);
-	//o}
 	StaticMeshComponent->SetupAttachment(GetRootComponent());
 	
 }
@@ -27,6 +23,11 @@ void AHWPMeshActor::SetIsEnabled(bool InEnabled)
 }
 
 #if WITH_EDITOR
+
+void AHWPMeshActor::SetStaticMesh(UStaticMesh* NewStaticMesh)
+{
+	StaticMeshComponent->SetStaticMesh(NewStaticMesh);
+}
 
 void AHWPMeshActor::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
 {

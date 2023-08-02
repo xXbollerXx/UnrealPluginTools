@@ -33,7 +33,8 @@ private:
 	UPROPERTY()
 	UStaticMesh* StaticMesh = nullptr;
 
-	
+	static const FSoftObjectPath BasicCube;
+
 	FString GetCurrentStaticMeshPath() const;
 
 	void OnStaticMeshSelected(const FAssetData& AssetData);

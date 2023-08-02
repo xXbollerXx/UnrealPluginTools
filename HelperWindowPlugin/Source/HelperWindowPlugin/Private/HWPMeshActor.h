@@ -15,6 +15,8 @@ public:
 
 	bool GetIsEnabled() const {return IsEnabled;}
 
+	void SetStaticMesh(UStaticMesh* NewStaticMesh);
+
 protected:
 
 #if WITH_EDITOR
@@ -25,6 +27,7 @@ private:
 	
 	UPROPERTY(EditAnywhere)
 	bool IsEnabled = true;
+	
 	UPROPERTY(VisibleAnywhere)
 	UStaticMeshComponent* StaticMeshComponent;
 

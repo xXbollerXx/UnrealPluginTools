@@ -11,9 +11,12 @@
 
 BEGIN_SLATE_FUNCTION_BUILD_OPTIMIZATION
 
+const FSoftObjectPath SHelperWindowPluginMenu::BasicCube("/Engine/BasicShapes/Cube", "Cube", {});
+
 
 void SHelperWindowPluginMenu::Construct(const FArguments& InArgs)
 {
+	StaticMesh = LoadObject<UStaticMesh>(nullptr, *BasicCube.ToString());
 
 
 	TSharedRef<SHorizontalBox> TextHorizontalBox = SNew(SHorizontalBox);
@@ -96,7 +99,8 @@ FReply SHelperWindowPluginMenu::SpawnMeshActor()
 	UWorld* World = GEditor->GetEditorWorldContext().World();
 	if (World)
 	{
-		World->SpawnActor(AHWPMeshActor::StaticClass());
+		AHWPMeshActor* MeshActor = World->SpawnActor<AHWPMeshActor>(AHWPMeshActor::StaticClass());
+		MeshActor->SetStaticMesh(StaticMesh);
 	}
 	return FReply::Handled();
 }
