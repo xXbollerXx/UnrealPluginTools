@@ -16,23 +16,15 @@ public:
 		}
 
 	SLATE_END_ARGS()
-
+public:
 	/** Constructs this widget with InArgs */
 	void Construct(const FArguments& InArgs);
 
+protected:
 
-	FReply SpawnMeshActor();
-
-	UFUNCTION()
-	void OnAssetSelected(const FAssetData& AssetData);
-
-	FString GetCurrentStaticMeshPath() const;
-
-	void OnStaticMeshSelected(const FAssetData& AssetData);
-
-	void OnCheckboxChanged(ECheckBoxState CheckBoxState);
-
+	
 	virtual void Tick(const FGeometry& AllottedGeometry, const double InCurrentTime, const float InDeltaTime) override;
+private:
 
 	TSharedPtr<SCheckBox> CheckBox;
 
@@ -40,4 +32,13 @@ public:
 
 	UPROPERTY()
 	UStaticMesh* StaticMesh = nullptr;
+
+	
+	FString GetCurrentStaticMeshPath() const;
+
+	void OnStaticMeshSelected(const FAssetData& AssetData);
+
+	FReply SpawnMeshActor();
+	
+	void OnCheckboxChanged(ECheckBoxState CheckBoxState);
 };

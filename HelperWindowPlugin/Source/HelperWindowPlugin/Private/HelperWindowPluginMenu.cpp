@@ -11,6 +11,7 @@
 
 BEGIN_SLATE_FUNCTION_BUILD_OPTIMIZATION
 
+
 void SHelperWindowPluginMenu::Construct(const FArguments& InArgs)
 {
 
@@ -46,17 +47,6 @@ void SHelperWindowPluginMenu::Construct(const FArguments& InArgs)
 	AllowedClasses.Add(UStaticMesh::StaticClass());
 	TArray<TWeakObjectPtr<USoundWave>> Objects;
 
-	TSharedRef<SWidget> StaticMeshPicker = PropertyCustomizationHelpers::MakeAssetPickerWithMenu(
-		FAssetData(),
-		false,
-		AllowedClasses,
-		PropertyCustomizationHelpers::GetNewAssetFactoriesForClasses(AllowedClasses),
-		FOnShouldFilterAsset(),
-		FOnAssetSelected::CreateSP(this, &SHelperWindowPluginMenu::OnAssetSelected),
-		FSimpleDelegate()
-		);
-
-
 	ChildSlot
 	[
 		SNew(SVerticalBox)
@@ -87,19 +77,15 @@ void SHelperWindowPluginMenu::Construct(const FArguments& InArgs)
 				SNew(SHorizontalBox)
 				+SHorizontalBox::Slot()
 				[
-					//CheckHorizontalBox
-					//SNew(SPropertyValueWidget)
-					//StaticMeshPicker
 					SNew(SObjectPropertyEntryBox)
 					.DisplayBrowse(true)
-					.DisplayCompactSize(false)
 					.DisplayThumbnail(true)
 					.DisplayUseSelected(true)
-					.EnableContentPicker(true)
 					.AllowedClass(UStaticMesh::StaticClass())
 					.AllowClear(true)
 					.ObjectPath(this, &SHelperWindowPluginMenu::GetCurrentStaticMeshPath)
 					.OnObjectChanged(this, &SHelperWindowPluginMenu::OnStaticMeshSelected)
+					
 				]
 			]
 	];
@@ -107,22 +93,15 @@ void SHelperWindowPluginMenu::Construct(const FArguments& InArgs)
 
 FReply SHelperWindowPluginMenu::SpawnMeshActor()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Function : I DID IT"));
-
 	UWorld* World = GEditor->GetEditorWorldContext().World();
 	if (World)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Function : Got world"));
-
 		World->SpawnActor(AHWPMeshActor::StaticClass());
 	}
 	return FReply::Handled();
 }
 
-void SHelperWindowPluginMenu::OnAssetSelected(const FAssetData& AssetData)
-{
-	StaticMesh = CastChecked<UStaticMesh>(AssetData.GetAsset());
-}
+
 
 FString SHelperWindowPluginMenu::GetCurrentStaticMeshPath() const
 {
@@ -131,6 +110,7 @@ FString SHelperWindowPluginMenu::GetCurrentStaticMeshPath() const
 
 void SHelperWindowPluginMenu::OnStaticMeshSelected(const FAssetData& AssetData)
 {
+	StaticMesh = CastChecked<UStaticMesh>(AssetData.GetAsset());
 }
 
 void SHelperWindowPluginMenu::OnCheckboxChanged(ECheckBoxState CheckBoxState)
