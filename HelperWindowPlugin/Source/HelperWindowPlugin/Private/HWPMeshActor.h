@@ -15,7 +15,7 @@ public:
 
 	bool GetIsEnabled() const {return IsEnabled;}
 
-	void SetStaticMesh(UStaticMesh* NewStaticMesh);
+	void SetStaticMesh(UStaticMesh* NewStaticMesh, UMaterialInterface* Material);
 
 protected:
 

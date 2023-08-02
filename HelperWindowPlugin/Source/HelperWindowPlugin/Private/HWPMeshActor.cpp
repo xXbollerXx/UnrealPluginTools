@@ -24,9 +24,10 @@ void AHWPMeshActor::SetIsEnabled(bool InEnabled)
 
 #if WITH_EDITOR
 
-void AHWPMeshActor::SetStaticMesh(UStaticMesh* NewStaticMesh)
+void AHWPMeshActor::SetStaticMesh(UStaticMesh* NewStaticMesh, UMaterialInterface* Material)
 {
 	StaticMeshComponent->SetStaticMesh(NewStaticMesh);
+	StaticMeshComponent->SetMaterial(0, Material);
 }
 
 void AHWPMeshActor::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)

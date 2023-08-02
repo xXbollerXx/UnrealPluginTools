@@ -5,6 +5,7 @@
 
 #include "EditorLevelUtils.h"
 #include "HWPMeshActor.h"
+#include "LevelEditorViewport.h"
 #include "PropertyCustomizationHelpers.h"
 #include "Selection.h"
 #include "SlateOptMacros.h"
@@ -12,11 +13,13 @@
 BEGIN_SLATE_FUNCTION_BUILD_OPTIMIZATION
 
 const FSoftObjectPath SHelperWindowPluginMenu::BasicCube("/Engine/BasicShapes/Cube", "Cube", {});
+const FSoftObjectPath SHelperWindowPluginMenu::BasicMaterial("/Engine/BasicShapes/BasicShapeMaterial", "BasicShapeMaterial", {});
 
 
 void SHelperWindowPluginMenu::Construct(const FArguments& InArgs)
 {
 	StaticMesh = LoadObject<UStaticMesh>(nullptr, *BasicCube.ToString());
+	MaterialInterface = LoadObject<UMaterialInterface>(nullptr, *BasicMaterial.ToString());
 
 
 	TSharedRef<SHorizontalBox> TextHorizontalBox = SNew(SHorizontalBox);
@@ -80,6 +83,11 @@ void SHelperWindowPluginMenu::Construct(const FArguments& InArgs)
 				SNew(SHorizontalBox)
 				+SHorizontalBox::Slot()
 				[
+					SNew(STextBlock)
+					.Text(FText::FromString("Mesh"))
+				]
+				+SHorizontalBox::Slot()
+				[
 					SNew(SObjectPropertyEntryBox)
 					.DisplayBrowse(true)
 					.DisplayThumbnail(true)
@@ -91,6 +99,29 @@ void SHelperWindowPluginMenu::Construct(const FArguments& InArgs)
 					
 				]
 			]
+			+ SVerticalBox::Slot()
+			.AutoHeight()
+			.Padding(5)
+			[
+				SNew(SHorizontalBox)
+				+SHorizontalBox::Slot()
+				[
+					SNew(STextBlock)
+					.Text(FText::FromString("Material"))
+				]
+				+SHorizontalBox::Slot()
+				[
+					SNew(SObjectPropertyEntryBox)
+					.DisplayBrowse(true)
+					.DisplayThumbnail(true)
+					.DisplayUseSelected(true)
+					.AllowedClass(UMaterialInterface::StaticClass())
+					.AllowClear(true)
+					.ObjectPath(this, &SHelperWindowPluginMenu::GetCurrentMaterialInterfacePath)
+					.OnObjectChanged(this, &SHelperWindowPluginMenu::OnMaterialInterfaceSelected)
+				]
+
+		]
 	];
 }
 
@@ -100,12 +131,16 @@ FReply SHelperWindowPluginMenu::SpawnMeshActor()
 	if (World)
 	{
 		AHWPMeshActor* MeshActor = World->SpawnActor<AHWPMeshActor>(AHWPMeshActor::StaticClass());
-		MeshActor->SetStaticMesh(StaticMesh);
+		
+		MeshActor->SetStaticMesh(StaticMesh, MaterialInterface);
+		
+		GEditor->MoveActorInFrontOfCamera(*MeshActor, 
+					  GCurrentLevelEditingViewportClient->GetViewLocation(), 
+					  GCurrentLevelEditingViewportClient->GetViewRotation().Vector());
 	}
+				  
 	return FReply::Handled();
 }
-
-
 
 FString SHelperWindowPluginMenu::GetCurrentStaticMeshPath() const
 {
@@ -127,6 +162,18 @@ void SHelperWindowPluginMenu::OnCheckboxChanged(ECheckBoxState CheckBoxState)
 			Actor->SetIsEnabled(CheckBoxState == ECheckBoxState::Checked ? true : false);
 		}
 	}
+}
+
+FString SHelperWindowPluginMenu::GetCurrentMaterialInterfacePath() const
+{
+	return MaterialInterface ? MaterialInterface->GetPathName() : FString("");
+
+}
+
+void SHelperWindowPluginMenu::OnMaterialInterfaceSelected(const FAssetData& AssetData)
+{
+	MaterialInterface = CastChecked<UMaterialInterface>(AssetData.GetAsset());
+
 }
 
 void SHelperWindowPluginMenu::Tick(const FGeometry& AllottedGeometry, const double InCurrentTime,

@@ -33,7 +33,12 @@ private:
 	UPROPERTY()
 	UStaticMesh* StaticMesh = nullptr;
 
+	UPROPERTY()
+	UMaterialInterface* MaterialInterface = nullptr;
+
 	static const FSoftObjectPath BasicCube;
+	
+	static const FSoftObjectPath BasicMaterial;
 
 	FString GetCurrentStaticMeshPath() const;
 
@@ -42,4 +47,8 @@ private:
 	FReply SpawnMeshActor();
 	
 	void OnCheckboxChanged(ECheckBoxState CheckBoxState);
+
+	FString GetCurrentMaterialInterfacePath() const;
+
+	void OnMaterialInterfaceSelected(const FAssetData& AssetData);
 };
