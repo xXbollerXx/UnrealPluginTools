@@ -57,19 +57,14 @@ void SHelperWindowPluginMenu::Construct(const FArguments& InArgs)
 	[
 		SNew(SVerticalBox)
 		+ SVerticalBox::Slot()
-		.HAlign(HAlign_Fill)
+		.HAlign(HAlign_Center)
 		.AutoHeight()
-		.Padding(5)
-			[
-				SNew(SHorizontalBox)
-				+ SHorizontalBox::Slot()
-				.AutoWidth()
-					[
-						SNew(SButton)
-						.Text(FText::FromString("Spawn Actor other"))
-						.OnClicked(this, &SHelperWindowPluginMenu::SpawnMeshActor)
-					]
-			]
+		.Padding(15)
+		[
+			SNew(STextBlock)
+			.Text(FText::FromString("Details"))
+			//.Font(F)
+		]
 		+ SVerticalBox::Slot()
 		.AutoHeight()
 		.Padding(5)
@@ -82,6 +77,15 @@ void SHelperWindowPluginMenu::Construct(const FArguments& InArgs)
 			[
 				CheckHorizontalBox
 			]
+		+ SVerticalBox::Slot()
+		.HAlign(HAlign_Center)
+		.AutoHeight()
+		.Padding(15)
+		[
+			SNew(STextBlock)
+			.Text(FText::FromString("Spawn New Actor Details"))
+			//.Font(2)
+		]
 		+ SVerticalBox::Slot()
 		.AutoHeight()
 		.Padding(5)
@@ -128,6 +132,20 @@ void SHelperWindowPluginMenu::Construct(const FArguments& InArgs)
 				]
 
 		]
+		+ SVerticalBox::Slot()
+		.HAlign(HAlign_Center)
+		.AutoHeight()
+		.Padding(5)
+			[
+				SNew(SHorizontalBox)
+				+ SHorizontalBox::Slot()
+				.AutoWidth()
+					[
+						SNew(SButton)
+						.Text(FText::FromString("Spawn Actor"))
+						.OnClicked(this, &SHelperWindowPluginMenu::SpawnMeshActor)
+					]
+			]
 	];
 }
 
@@ -195,7 +213,6 @@ void SHelperWindowPluginMenu::Tick(const FGeometry& AllottedGeometry, const doub
 	for (FSelectionIterator It(GEditor->GetSelectedActorIterator()); It; ++It)
 	{
 		AHWPMeshActor* Actor = Cast<AHWPMeshActor>(*It);
-		UE_LOG(LogTemp, Warning, TEXT("Function : Actor name : %s"), *Actor->GetActorLabel());
 
 		if (!Actor)
 		{
