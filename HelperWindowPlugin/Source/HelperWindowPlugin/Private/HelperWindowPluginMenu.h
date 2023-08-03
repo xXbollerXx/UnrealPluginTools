@@ -51,4 +51,12 @@ private:
 	FString GetCurrentMaterialInterfacePath() const;
 
 	void OnMaterialInterfaceSelected(const FAssetData& AssetData);
+
+	void OnValueCommitted(float Value);
+
+	TOptional<float> GetValue() const;
+
+	float NumericEntryBoxValue;
+
+	TSharedPtr<SNumericEntryBox<float>> NumericEntryBox;
 };

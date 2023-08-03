@@ -3,12 +3,12 @@
 
 #include "HelperWindowPluginMenu.h"
 
-#include "EditorLevelUtils.h"
 #include "HWPMeshActor.h"
 #include "LevelEditorViewport.h"
 #include "PropertyCustomizationHelpers.h"
 #include "Selection.h"
 #include "SlateOptMacros.h"
+#include "Widgets/Input/SNumericEntryBox.h"
 
 BEGIN_SLATE_FUNCTION_BUILD_OPTIMIZATION
 
@@ -21,34 +21,36 @@ void SHelperWindowPluginMenu::Construct(const FArguments& InArgs)
 	StaticMesh = LoadObject<UStaticMesh>(nullptr, *BasicCube.ToString());
 	MaterialInterface = LoadObject<UMaterialInterface>(nullptr, *BasicMaterial.ToString());
 
+	
 
-	TSharedRef<SHorizontalBox> TextHorizontalBox = SNew(SHorizontalBox);
-	TextHorizontalBox->AddSlot()
+	TSharedRef<SHorizontalBox> TextHorizontalBox = SNew(SHorizontalBox)
+	+SHorizontalBox::Slot()
 	[
 		SNew(STextBlock)
 		.Text(FText::FromString("Actor Name"))
-	];
-
-	TextHorizontalBox->AddSlot()
+	]
+	+SHorizontalBox::Slot()
 	[
 		SAssignNew(ActorNameTextBlock, STextBlock)
 		.Text(FText::FromString(""))
 	];
 
 
-	TSharedRef<SHorizontalBox> CheckHorizontalBox = SNew(SHorizontalBox);
-	CheckHorizontalBox->AddSlot()
+	
+	TSharedRef<SHorizontalBox> CheckHorizontalBox = SNew(SHorizontalBox)
+	+SHorizontalBox::Slot()
 	[
 		SNew(STextBlock)
 		.Text(FText::FromString("Actor Can Be Damaged"))
-	];
-
-	CheckHorizontalBox->AddSlot()
+	]
+	+SHorizontalBox::Slot()
 	[
 		SAssignNew(CanBeDamagedCheckBox, SCheckBox)
 		.OnCheckStateChanged(this, &SHelperWindowPluginMenu::OnCheckboxChanged)
 	];
 
+
+	
 	TSharedRef<SVerticalBox> DetailsPanel = SNew(SVerticalBox)
 	+ SVerticalBox::Slot()
 	.HAlign(HAlign_Center)
@@ -69,6 +71,24 @@ void SHelperWindowPluginMenu::Construct(const FArguments& InArgs)
 	.Padding(5)
 		[
 			CheckHorizontalBox
+		]
+	+ SVerticalBox::Slot()
+	.AutoHeight()
+	.Padding(5)
+		[
+			SNew(SHorizontalBox)
+			+SHorizontalBox::Slot()
+				[
+					SNew(STextBlock)
+					.Text(FText::FromString("Damage Multiplier"))
+				]
+			+SHorizontalBox::Slot()
+				[
+					SAssignNew(NumericEntryBox, SNumericEntryBox<float>)
+					.Value(this, &SHelperWindowPluginMenu::GetValue)
+					.OnValueChanged(this, &SHelperWindowPluginMenu::OnValueCommitted)
+					.UndeterminedString(FText::FromString("Undetermined"))
+				]
 		];
 
 
@@ -215,6 +235,51 @@ void SHelperWindowPluginMenu::OnMaterialInterfaceSelected(const FAssetData& Asse
 
 }
 
+void SHelperWindowPluginMenu::OnValueCommitted(float Value)
+{
+	NumericEntryBoxValue = Value;
+
+	for (FSelectionIterator It(GEditor->GetSelectedActorIterator()); It; ++It)
+	{
+		AHWPMeshActor* Actor = Cast<AHWPMeshActor>(*It);
+		if (Actor)
+		{
+			Actor->DamageMultiplier = NumericEntryBoxValue;
+		}
+	}
+}
+
+TOptional<float> SHelperWindowPluginMenu::GetValue() const
+{
+	AHWPMeshActor* First = nullptr;
+	TOptional<float> Temp = TOptional<float>();
+	
+	for (FSelectionIterator It(GEditor->GetSelectedActorIterator()); It; ++It)
+	{
+		AHWPMeshActor* Actor = Cast<AHWPMeshActor>(*It);
+
+		if (Actor)
+		{
+			if (!First)
+			{
+				First = Actor;
+			}
+
+			if (Actor->DamageMultiplier != First->DamageMultiplier)
+			{
+				return TOptional<float>();
+			}
+
+			if (Actor == First)
+			{
+				Temp = TOptional<float>(Actor->DamageMultiplier);
+			}
+		}
+	}
+	
+	return  Temp;
+}
+
 void SHelperWindowPluginMenu::Tick(const FGeometry& AllottedGeometry, const double InCurrentTime,
                                    const float InDeltaTime)
 {
@@ -223,6 +288,7 @@ void SHelperWindowPluginMenu::Tick(const FGeometry& AllottedGeometry, const doub
 
 	ActorNameTextBlock->SetVisibility(EVisibility::Visible);
 	CanBeDamagedCheckBox->SetVisibility(EVisibility::Visible);
+	NumericEntryBox->SetVisibility(EVisibility::Visible);
 	
 	AHWPMeshActor* FirstInstance = nullptr;
 	for (FSelectionIterator It(GEditor->GetSelectedActorIterator()); It; ++It)
@@ -233,6 +299,7 @@ void SHelperWindowPluginMenu::Tick(const FGeometry& AllottedGeometry, const doub
 		{
 			ActorNameTextBlock->SetVisibility(EVisibility::Collapsed);
 			CanBeDamagedCheckBox->SetVisibility(EVisibility::Collapsed);
+			NumericEntryBox->SetVisibility(EVisibility::Collapsed);
 			break;
 		}
 

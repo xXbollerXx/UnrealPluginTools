@@ -9,25 +9,17 @@ class AHWPMeshActor : public AActor
 	GENERATED_BODY()
 	
 public:	
+	UPROPERTY(EditAnywhere)
+	float DamageMultiplier = 0;
+	
 	AHWPMeshActor();
-
-	void SetIsEnabled(bool InEnabled);
-
-	bool GetIsEnabled() const {return IsEnabled;}
-
-	void SetStaticMesh(UStaticMesh* NewStaticMesh, UMaterialInterface* Material);
-
-protected:
-
+	
 #if WITH_EDITOR
-	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
+	void SetStaticMesh(UStaticMesh* NewStaticMesh, UMaterialInterface* Material);
 #endif
 
 private:
-	
-	UPROPERTY(EditAnywhere)
-	bool IsEnabled = true;
-	
+
 	UPROPERTY(VisibleAnywhere)
 	UStaticMeshComponent* StaticMeshComponent;
 
