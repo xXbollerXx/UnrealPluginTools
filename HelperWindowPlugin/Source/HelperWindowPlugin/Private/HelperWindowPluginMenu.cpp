@@ -32,7 +32,7 @@ void SHelperWindowPluginMenu::Construct(const FArguments& InArgs)
 	TextHorizontalBox->AddSlot()
 	[
 		SAssignNew(ActorNameTextBlock, STextBlock)
-		.Text(FText::FromString("TESTNAME"))
+		.Text(FText::FromString(""))
 	];
 
 
@@ -40,12 +40,12 @@ void SHelperWindowPluginMenu::Construct(const FArguments& InArgs)
 	CheckHorizontalBox->AddSlot()
 	[
 		SNew(STextBlock)
-		.Text(FText::FromString("IsEnabled"))
+		.Text(FText::FromString("Actor Can Be Damaged"))
 	];
 
 	CheckHorizontalBox->AddSlot()
 	[
-		SAssignNew(CheckBox, SCheckBox)
+		SAssignNew(CanBeDamagedCheckBox, SCheckBox)
 		.OnCheckStateChanged(this, &SHelperWindowPluginMenu::OnCheckboxChanged)
 	];
 
@@ -72,6 +72,78 @@ void SHelperWindowPluginMenu::Construct(const FArguments& InArgs)
 		];
 
 
+	TSharedRef<SVerticalBox> SpawnActorDetails = SNew(SVerticalBox)
+	+ SVerticalBox::Slot()
+	.HAlign(HAlign_Center)
+	.AutoHeight()
+	.Padding(15)
+	[
+		SNew(STextBlock)
+		.Text(FText::FromString("Spawn New Actor Details"))
+	]
+	+ SVerticalBox::Slot()
+	.AutoHeight()
+	.Padding(5)
+		[
+			SNew(SHorizontalBox)
+			+SHorizontalBox::Slot()
+			[
+				SNew(STextBlock)
+				.Text(FText::FromString("Mesh"))
+			]
+			+SHorizontalBox::Slot()
+			[
+				SNew(SObjectPropertyEntryBox)
+				.DisplayBrowse(true)
+				.DisplayThumbnail(true)
+				.DisplayUseSelected(true)
+				.AllowedClass(UStaticMesh::StaticClass())
+				.AllowClear(true)
+				.ObjectPath(this, &SHelperWindowPluginMenu::GetCurrentStaticMeshPath)
+				.OnObjectChanged(this, &SHelperWindowPluginMenu::OnStaticMeshSelected)
+				
+			]
+		]
+		+ SVerticalBox::Slot()
+		.AutoHeight()
+		.Padding(5)
+		[
+			SNew(SHorizontalBox)
+			+SHorizontalBox::Slot()
+			[
+				SNew(STextBlock)
+				.Text(FText::FromString("Material"))
+			]
+			+SHorizontalBox::Slot()
+			[
+				SNew(SObjectPropertyEntryBox)
+				.DisplayBrowse(true)
+				.DisplayThumbnail(true)
+				.DisplayUseSelected(true)
+				.AllowedClass(UMaterialInterface::StaticClass())
+				.AllowClear(true)
+				.ObjectPath(this, &SHelperWindowPluginMenu::GetCurrentMaterialInterfacePath)
+				.OnObjectChanged(this, &SHelperWindowPluginMenu::OnMaterialInterfaceSelected)
+			]
+
+	]
+	+ SVerticalBox::Slot()
+	.HAlign(HAlign_Center)
+	.AutoHeight()
+	.Padding(5)
+		[
+			SNew(SHorizontalBox)
+			+ SHorizontalBox::Slot()
+			.AutoWidth()
+				[
+					SNew(SButton)
+					.Text(FText::FromString("Spawn Actor"))
+					.OnClicked(this, &SHelperWindowPluginMenu::SpawnMeshActor)
+				]
+		];
+
+
+
 	ChildSlot
 	[
 		SNew(SVerticalBox)
@@ -83,73 +155,11 @@ void SHelperWindowPluginMenu::Construct(const FArguments& InArgs)
 				DetailsPanel
 			]
 		+ SVerticalBox::Slot()
-		.HAlign(HAlign_Center)
+		.HAlign(HAlign_Fill)
 		.AutoHeight()
 		.Padding(15)
-		[
-			SNew(STextBlock)
-			.Text(FText::FromString("Spawn New Actor Details"))
-			//.Font(2)
-		]
-		+ SVerticalBox::Slot()
-		.AutoHeight()
-		.Padding(5)
 			[
-				SNew(SHorizontalBox)
-				+SHorizontalBox::Slot()
-				[
-					SNew(STextBlock)
-					.Text(FText::FromString("Mesh"))
-				]
-				+SHorizontalBox::Slot()
-				[
-					SNew(SObjectPropertyEntryBox)
-					.DisplayBrowse(true)
-					.DisplayThumbnail(true)
-					.DisplayUseSelected(true)
-					.AllowedClass(UStaticMesh::StaticClass())
-					.AllowClear(true)
-					.ObjectPath(this, &SHelperWindowPluginMenu::GetCurrentStaticMeshPath)
-					.OnObjectChanged(this, &SHelperWindowPluginMenu::OnStaticMeshSelected)
-					
-				]
-			]
-			+ SVerticalBox::Slot()
-			.AutoHeight()
-			.Padding(5)
-			[
-				SNew(SHorizontalBox)
-				+SHorizontalBox::Slot()
-				[
-					SNew(STextBlock)
-					.Text(FText::FromString("Material"))
-				]
-				+SHorizontalBox::Slot()
-				[
-					SNew(SObjectPropertyEntryBox)
-					.DisplayBrowse(true)
-					.DisplayThumbnail(true)
-					.DisplayUseSelected(true)
-					.AllowedClass(UMaterialInterface::StaticClass())
-					.AllowClear(true)
-					.ObjectPath(this, &SHelperWindowPluginMenu::GetCurrentMaterialInterfacePath)
-					.OnObjectChanged(this, &SHelperWindowPluginMenu::OnMaterialInterfaceSelected)
-				]
-
-		]
-		+ SVerticalBox::Slot()
-		.HAlign(HAlign_Center)
-		.AutoHeight()
-		.Padding(5)
-			[
-				SNew(SHorizontalBox)
-				+ SHorizontalBox::Slot()
-				.AutoWidth()
-					[
-						SNew(SButton)
-						.Text(FText::FromString("Spawn Actor"))
-						.OnClicked(this, &SHelperWindowPluginMenu::SpawnMeshActor)
-					]
+				SpawnActorDetails
 			]
 	];
 }
@@ -188,7 +198,7 @@ void SHelperWindowPluginMenu::OnCheckboxChanged(ECheckBoxState CheckBoxState)
 		AHWPMeshActor* Actor = Cast<AHWPMeshActor>(*It);
 		if (Actor)
 		{
-			Actor->SetIsEnabled(CheckBoxState == ECheckBoxState::Checked ? true : false);
+			Actor->SetCanBeDamaged(CheckBoxState == ECheckBoxState::Checked ? true : false);
 		}
 	}
 }
@@ -212,7 +222,7 @@ void SHelperWindowPluginMenu::Tick(const FGeometry& AllottedGeometry, const doub
 
 
 	ActorNameTextBlock->SetVisibility(EVisibility::Visible);
-	CheckBox->SetVisibility(EVisibility::Visible);
+	CanBeDamagedCheckBox->SetVisibility(EVisibility::Visible);
 	
 	AHWPMeshActor* FirstInstance = nullptr;
 	for (FSelectionIterator It(GEditor->GetSelectedActorIterator()); It; ++It)
@@ -222,7 +232,7 @@ void SHelperWindowPluginMenu::Tick(const FGeometry& AllottedGeometry, const doub
 		if (!Actor)
 		{
 			ActorNameTextBlock->SetVisibility(EVisibility::Collapsed);
-			CheckBox->SetVisibility(EVisibility::Collapsed);
+			CanBeDamagedCheckBox->SetVisibility(EVisibility::Collapsed);
 			break;
 		}
 
@@ -230,16 +240,16 @@ void SHelperWindowPluginMenu::Tick(const FGeometry& AllottedGeometry, const doub
 		{
 			ActorNameTextBlock->SetVisibility(EVisibility::Collapsed);
 			
-			if (FirstInstance->GetIsEnabled() != Actor->GetIsEnabled())
+			if (FirstInstance->CanBeDamaged() != Actor->CanBeDamaged())
 			{
-				CheckBox->SetIsChecked( ECheckBoxState::Undetermined);
+				CanBeDamagedCheckBox->SetIsChecked( ECheckBoxState::Undetermined);
 			}
 		}
 		else
 		{
 			FirstInstance = Actor;
 			ActorNameTextBlock->SetText(FText::FromString(Actor->GetActorLabel()));
-			CheckBox->SetIsChecked(Actor->GetIsEnabled() ? ECheckBoxState::Checked : ECheckBoxState::Unchecked);
+			CanBeDamagedCheckBox->SetIsChecked(Actor->CanBeDamaged() ? ECheckBoxState::Checked : ECheckBoxState::Unchecked);
 		}
 	}
 }

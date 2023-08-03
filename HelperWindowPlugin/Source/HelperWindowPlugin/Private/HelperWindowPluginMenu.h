@@ -26,7 +26,7 @@ protected:
 	virtual void Tick(const FGeometry& AllottedGeometry, const double InCurrentTime, const float InDeltaTime) override;
 private:
 
-	TSharedPtr<SCheckBox> CheckBox;
+	TSharedPtr<SCheckBox> CanBeDamagedCheckBox;
 
 	TSharedPtr<STextBlock> ActorNameTextBlock;
 
