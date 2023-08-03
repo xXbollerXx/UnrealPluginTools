@@ -9,7 +9,6 @@
 #include "PropertyCustomizationHelpers.h"
 #include "Selection.h"
 #include "SlateOptMacros.h"
-#include "LevelEditor/Private/SLevelEditor.h"
 #include "Widgets/Input/SNumericEntryBox.h"
 
 BEGIN_SLATE_FUNCTION_BUILD_OPTIMIZATION
