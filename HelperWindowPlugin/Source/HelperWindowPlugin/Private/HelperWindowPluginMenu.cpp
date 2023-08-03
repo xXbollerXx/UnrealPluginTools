@@ -49,31 +49,38 @@ void SHelperWindowPluginMenu::Construct(const FArguments& InArgs)
 		.OnCheckStateChanged(this, &SHelperWindowPluginMenu::OnCheckboxChanged)
 	];
 
+	TSharedRef<SVerticalBox> DetailsPanel = SNew(SVerticalBox)
+	+ SVerticalBox::Slot()
+	.HAlign(HAlign_Center)
+	.AutoHeight()
+	//.Padding(15)
+		[
+			SNew(STextBlock)
+			.Text(FText::FromString("Details"))
+		]
+	+ SVerticalBox::Slot()
+	.AutoHeight()
+	.Padding(5)
+		[
+			TextHorizontalBox
+		]
+	+ SVerticalBox::Slot()
+	.AutoHeight()
+	.Padding(5)
+		[
+			CheckHorizontalBox
+		];
 
 
 	ChildSlot
 	[
 		SNew(SVerticalBox)
 		+ SVerticalBox::Slot()
-		.HAlign(HAlign_Center)
+		.HAlign(HAlign_Fill)
 		.AutoHeight()
 		.Padding(15)
-		[
-			SNew(STextBlock)
-			.Text(FText::FromString("Details"))
-			//.Font(F)
-		]
-		+ SVerticalBox::Slot()
-		.AutoHeight()
-		.Padding(5)
 			[
-				TextHorizontalBox
-			]
-		+ SVerticalBox::Slot()
-		.AutoHeight()
-		.Padding(5)
-			[
-				CheckHorizontalBox
+				DetailsPanel
 			]
 		+ SVerticalBox::Slot()
 		.HAlign(HAlign_Center)
