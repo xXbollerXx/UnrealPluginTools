@@ -4,10 +4,12 @@
 #include "HelperWindowPluginMenu.h"
 
 #include "HWPMeshActor.h"
+#include "LevelEditor.h"
 #include "LevelEditorViewport.h"
 #include "PropertyCustomizationHelpers.h"
 #include "Selection.h"
 #include "SlateOptMacros.h"
+#include "LevelEditor/Private/SLevelEditor.h"
 #include "Widgets/Input/SNumericEntryBox.h"
 
 BEGIN_SLATE_FUNCTION_BUILD_OPTIMIZATION
@@ -21,6 +23,10 @@ void SHelperWindowPluginMenu::Construct(const FArguments& InArgs)
 	StaticMesh = LoadObject<UStaticMesh>(nullptr, *BasicCube.ToString());
 	MaterialInterface = LoadObject<UMaterialInterface>(nullptr, *BasicMaterial.ToString());
 
+	FLevelEditorModule& LevelEditorModule = FModuleManager::GetModuleChecked< FLevelEditorModule >("LevelEditor");
+	LevelEditorModule.OnActorSelectionChanged().AddSP(this, &SHelperWindowPluginMenu::OnSelectionChanged);
+
+
 	
 
 	TSharedRef<SHorizontalBox> TextHorizontalBox = SNew(SHorizontalBox)
@@ -33,6 +39,7 @@ void SHelperWindowPluginMenu::Construct(const FArguments& InArgs)
 	[
 		SAssignNew(ActorNameTextBlock, STextBlock)
 		.Text(FText::FromString(""))
+		.Visibility(EVisibility::Collapsed)
 	];
 
 
@@ -47,6 +54,7 @@ void SHelperWindowPluginMenu::Construct(const FArguments& InArgs)
 	[
 		SAssignNew(CanBeDamagedCheckBox, SCheckBox)
 		.OnCheckStateChanged(this, &SHelperWindowPluginMenu::OnCheckboxChanged)
+		.Visibility(EVisibility::Collapsed)
 	];
 
 
@@ -88,6 +96,7 @@ void SHelperWindowPluginMenu::Construct(const FArguments& InArgs)
 					.Value(this, &SHelperWindowPluginMenu::GetValue)
 					.OnValueChanged(this, &SHelperWindowPluginMenu::OnValueCommitted)
 					.UndeterminedString(FText::FromString("Undetermined"))
+					.Visibility(EVisibility::Collapsed)
 				]
 		];
 
@@ -237,14 +246,12 @@ void SHelperWindowPluginMenu::OnMaterialInterfaceSelected(const FAssetData& Asse
 
 void SHelperWindowPluginMenu::OnValueCommitted(float Value)
 {
-	NumericEntryBoxValue = Value;
-
 	for (FSelectionIterator It(GEditor->GetSelectedActorIterator()); It; ++It)
 	{
 		AHWPMeshActor* Actor = Cast<AHWPMeshActor>(*It);
 		if (Actor)
 		{
-			Actor->DamageMultiplier = NumericEntryBoxValue;
+			Actor->DamageMultiplier = Value;
 		}
 	}
 }
@@ -280,20 +287,16 @@ TOptional<float> SHelperWindowPluginMenu::GetValue() const
 	return  Temp;
 }
 
-void SHelperWindowPluginMenu::Tick(const FGeometry& AllottedGeometry, const double InCurrentTime,
-                                   const float InDeltaTime)
+void SHelperWindowPluginMenu::OnSelectionChanged(const TArray<UObject*>& NewSelection, bool bForceRefresh)
 {
-	SCompoundWidget::Tick(AllottedGeometry, InCurrentTime, InDeltaTime);
-
-
 	ActorNameTextBlock->SetVisibility(EVisibility::Visible);
 	CanBeDamagedCheckBox->SetVisibility(EVisibility::Visible);
 	NumericEntryBox->SetVisibility(EVisibility::Visible);
 	
 	AHWPMeshActor* FirstInstance = nullptr;
-	for (FSelectionIterator It(GEditor->GetSelectedActorIterator()); It; ++It)
+	for (UObject* Object : NewSelection)
 	{
-		AHWPMeshActor* Actor = Cast<AHWPMeshActor>(*It);
+		AHWPMeshActor* Actor = Cast<AHWPMeshActor>(Object);
 
 		if (!Actor)
 		{

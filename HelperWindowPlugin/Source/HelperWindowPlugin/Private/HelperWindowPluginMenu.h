@@ -20,16 +20,14 @@ public:
 	/** Constructs this widget with InArgs */
 	void Construct(const FArguments& InArgs);
 
-protected:
-
-	
-	virtual void Tick(const FGeometry& AllottedGeometry, const double InCurrentTime, const float InDeltaTime) override;
 private:
 
 	TSharedPtr<SCheckBox> CanBeDamagedCheckBox;
 
 	TSharedPtr<STextBlock> ActorNameTextBlock;
 
+	TSharedPtr<SNumericEntryBox<float>> NumericEntryBox;
+	
 	UPROPERTY()
 	UStaticMesh* StaticMesh = nullptr;
 
@@ -56,7 +54,6 @@ private:
 
 	TOptional<float> GetValue() const;
 
-	float NumericEntryBoxValue;
+	void OnSelectionChanged(const TArray<UObject*>& NewSelection, bool bForceRefresh);
 
-	TSharedPtr<SNumericEntryBox<float>> NumericEntryBox;
 };
