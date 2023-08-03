@@ -49,9 +49,7 @@ void SHelperWindowPluginMenu::Construct(const FArguments& InArgs)
 		.OnCheckStateChanged(this, &SHelperWindowPluginMenu::OnCheckboxChanged)
 	];
 
-	TArray<const UClass*> AllowedClasses;
-	AllowedClasses.Add(UStaticMesh::StaticClass());
-	TArray<TWeakObjectPtr<USoundWave>> Objects;
+
 
 	ChildSlot
 	[
